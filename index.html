@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Jacks or Better</title>
+<style>
+    /* @font-face {
+        font-family: 'MyFont';
+        src: url('cardcharacters.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        } */
+    body {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        font-family: system-ui, sans-serif;
+        letter-spacing: .1rem; 
+        background:darkblue; 
+        color: white;
+        margin: 0;
+        box-sizing: border-box;
+
+        user-select: none;   /* Standard property */
+        -webkit-user-select: none; /* Chrome/Safari */
+        -moz-user-select: none;    /* Firefox */
+        -ms-user-select: none;     /* IE/Edge */
+    }
+
+    /* --- Paytable --- */
+    .tbl {
+        border: 1px solid yellow;
+        border-radius: .5rem;
+        padding: .2rem;
+        box-sizing: border-box;
+        overflow: hidden;
+        background: rgba(0,0,0,.7);
+    }
+    
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        color: yellow;
+        border: none;
+        line-height: 1rem;
+        table-layout: fixed;
+    }
+
+    table td {
+        border: none;
+        text-align: right;
+    }
+    table td:first-child {
+        text-align: left;
+        width: 16rem;
+    }
+    .highlight-row {
+        background: rgba(255, 255, 255, 0.33);
+        /* color: white; */
+        /* font-weight: bold; */
+    }
+
+    .highlight-col {
+        background: rgba(255, 0, 0, .33);
+    }
+
+    .highlight-row.highlight-col {
+        background: rgba(255, 0, 0, .66);
+    }
+    .container{
+        position: relative;
+        /* background-color: red; */
+        width: 32rem;
+        /* margin-top: 2rem; */
+    }
+    .banner{
+        display:flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        /* color: yellow; */
+        top: 50%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-30%);
+        font-size: 1.5rem;
+        background-color: rgba(0,0,0,.7);
+        backdrop-filter: blur(5px);
+        padding: 1.5rem;
+        border-radius: .5rem;
+        border: solid 1px yellow;
+        box-shadow: 10px 10px 20px rgba(0,0,0,.4);
+    }
+    .hidden{
+        visibility: hidden;
+    }
+    .outlined{
+        color: red;
+        /* font-weight: bold; */
+        text-shadow:
+        1px 0 yellow,
+        -1px 0 yellow,
+        0 1px yellow,
+        0 -1px yellow,
+        1px 1px yellow,
+        -1px -1px yellow,
+        1px -1px yellow,
+        -1px 1px yellow;
+    }
+    .hand {
+        display: flex;
+        justify-content: center;
+        position: relative; 
+        gap: .5rem; 
+        margin-top: 2rem; 
+    }
+    .hand.clickable .card {
+        cursor: pointer;
+        pointer-events: all;
+    }
+    .card {
+        /* font-family: MyFont, sans-serif; */
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        /* align-items: center; */
+        width: 6rem;
+        height: 8.4rem;
+        /* font-size: 1.6rem; */
+        /* line-height: 1.4rem; */
+        /* font-weight: bold; */
+        color: black;
+        background-color: white;
+        transition: transform 0.2s, box-shadow 0.2s;
+        /* border: 2px solid #333; */
+        border-radius: .3rem;
+        padding: .3rem;
+        box-sizing: border-box;
+        cursor: not-allowed;
+        pointer-events: none;
+        box-shadow: 3px 3px 5px black;
+    }
+    .card.red {
+        color: red;
+    }
+    .card .suit {
+        font-size: 3rem;
+        line-height: 1.4rem;
+    }
+    .card .rank {
+        /* background-color: aqua; */
+        font-size: 5rem;
+        text-align: center;
+        /* width: 100%; */
+        line-height: 5.5rem;
+        letter-spacing: -.6rem;
+        transform: translateX(-.5rem);
+        /* font-weight: bold; */
+    }
+    .card.back {
+        background-color: lightcoral;
+        border: white solid 5px;
+    }
+    .card.held {
+        box-shadow: none;
+        transform: translateX(2px) translateY(2px);
+    }
+    .card.held::before {
+        content: "HELD";
+        position: absolute;
+        top: -20%;
+        left: 50%;
+        transform: translateX(-50%);
+        color: white;
+        font-size: 1rem;
+        font-weight: normal;
+    }
+    td.flash {
+        /* background-color: lawngreen; */
+        /* animation: flashAnim 0.6s ease-in-out 0s 3; */
+        animation: tdFlash 600ms ease-in-out infinite;
+    }
+    @keyframes tdFlash {
+        50% { background: rgba(255, 255, 255, 0.66); }
+    }
+    .card.flash {
+        /* background-color: lawngreen; */
+        /* animation: flashAnim 0.6s ease-in-out 0s 3; */
+        animation: cardFlash 600ms ease-in-out infinite;
+    }
+    @keyframes cardFlash {
+        50% {box-shadow: 0 0 20px yellow; }
+        /* 50% {border: solid 5px yellow} */
+        /* 0%,100% { box-shadow: 0 0 0px yellow; transform: translateY(-10px) scale(1); } */
+        /* 50% { box-shadow: 0 0 15px yellow; transform: translateY(-10px) scale(1.1); } */
+    }
+    .pulse {
+        animation: pulseAnim 0.15s ease-in-out;
+    }
+    @keyframes pulseAnim {
+        0% { transform: scale(1); color: gold; }
+        50% { transform: scale(1.3); color: gold; }
+        100% { transform: scale(1); color: gold; }
+    }
+    .stats{
+        display:flex;
+        justify-content: space-between;
+        margin: 1rem;
+    }
+    /* .stat{
+        color: yellow;
+        font-size: 1rem;
+    } */
+    .buttons{
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    button {
+        padding: 8px 15px;
+        min-width: 6rem;
+        min-height: 4rem;
+        font-size: 1rem;
+        font-weight: bold; 
+        cursor: pointer;
+        background-color: yellow;
+        border: none;
+        border-radius: .5rem;
+        flex:1;
+        box-shadow: 3px 3px 0 rgb(100, 100, 0);
+    }
+    button:disabled {
+        cursor: not-allowed;
+        background-color: darkgray;
+        box-shadow: 3px 3px 0 gray;
+    }
+    button:active {
+        box-shadow: 1px 1px 0 gray;
+        transform: translateX(2px) translateY(2px);
+    }
+    footer {
+        color: rgb(0,100,255);
+    }
+    a {
+        text-decoration: none;
+        color: rgb(0,100,255);
+    }
+
+</style>
+</head>
+<body>
+
+<h1>JACKS or BETTER</h1>
+<!-- <p>Double Double Bonus</p> -->
+
+<div class="container tbl">
+    <table id="paytable"></table>
+</div>
+
+<div class="container">
+    <div class="hand" id="hand"></div>
+    <!-- Second here to see banner over cards -->
+    <span class="banner outlined" id="banner"></span>
+</div>
+
+<div class="container stats">
+    <span class="stat outlined" id="win"></span>
+    <!-- <span> Bet: <span id="bet"></span></span> -->
+  <span class="stat outlined" id="credits"></span>
+</div>
+
+<div class="container buttons">
+  <button id="betOneBtn" disabled>BET ONE</button>
+  <button id="betMaxBtn" disabled>BET MAX</button>
+  <button id="dealBtn" disabled>DEAL</button>
+  <button id="resetBtn" disabled>CASH OUT</button>
+</div>
+<footer>
+    Created by: <a href="https://www.t.me/u002e">@u002E</a>; <span id="viewport"></span> 
+</footer>
+<script>
+    const DEFAULTS = Object.freeze({  //  Read only object
+        START_CREDITS: 100,
+        MIN_BET: 1,
+        MAX_BET: 5,
+        SUITS: ["♥", "♦", "♣", "♠"],
+        RANKS: ['A','2','3','4','5','6','7','8','9','10','J','Q','K'],
+        VALUES: {
+            '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, 
+            '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14
+        },
+        HAND_SIZE: 5
+    })
+    
+    const HAND_RANKS = Object.freeze({
+        ROYAL_FLUSH: {
+            name: "ROYAL FLUSH",
+            payout: [250, 500, 750, 1000, 4000]
+        },
+        STRAIGHT_FLUSH: {
+            name: "STRAIGHT FLUSH",
+            payout: [50, 100, 150, 200, 250]
+        },
+        FOUR_ACES_WITH_ANY_2_3_4: {
+            name: "FOUR ACES w/2, 3, or 4",
+            payout: [400, 800, 1200, 1600, 2000]
+        },
+        FOUR_2s_3s_4s_W_OR_ACE_2_3_4: {
+            name: "FOUR 2, 3, or 4 w/A-4",
+            payout: [160, 320, 480, 640, 800]
+        },
+        FOUR_ACES: {
+            name: "FOUR ACES",
+            payout: [160, 320, 480, 640, 800]
+        },
+        FOUR_2s_3s_4s: {
+            name: "FOUR 2, 3, or 4",
+            payout: [80, 160, 240, 320, 400]
+        },
+        FOUR_5s_THRU_KINGS: {
+            name: "FOUR 5-K",
+            payout: [50, 100, 150, 200, 250]
+        },
+        FULL_HOUSE: {
+            name: "FULL HOUSE",
+            payout: [10, 20, 30, 40, 50]
+        },
+        FLUSH: {
+            name: "FLUSH",
+            payout: [6, 12, 18, 24, 30]
+        },
+        STRAIGHT: {
+            name: "STRAIGHT",
+            payout: [4, 8, 12, 16, 20]
+        },
+        THREE_OF_A_KIND: {
+            name: "THREE OF A KIND",
+            payout: [3, 6, 9, 12, 15]
+        },
+        TWO_PAIR: {
+            name: "TWO PAIR",
+            payout: [1, 2, 3, 4, 5]
+        },
+        JACKS_OR_BETTER: {
+            name: "JACKS OR BETTER",
+            payout: [1, 2, 3, 4, 5]
+        },
+    });
+
+    const HAND_RULES = Object.freeze([
+        // ROYAL FLUSH
+        {
+            rank: HAND_RANKS.ROYAL_FLUSH,
+            priority: 1000,
+            test: ctx =>
+                ctx.isFlush &&
+                ctx.sortedValues.toString() === "10,11,12,13,14",
+            indexes: ctx => ctx.allIndexes
+        },
+
+        // STRAIGHT FLUSH
+        {
+            rank: HAND_RANKS.STRAIGHT_FLUSH,
+            priority: 900,
+            test: ctx => ctx.isFlush && ctx.isStraight,
+            indexes: ctx => ctx.allIndexes
+        },
+
+        // FOUR ACES WITH ANY 2,3,4
+        {
+            rank: HAND_RANKS.FOUR_ACES_WITH_ANY_2_3_4,
+            priority: 800,
+            test: ctx => {
+                const quad = ctx.uniqueValues.find(v => ctx.rankMap[v]?.length === 4);
+                if (quad !== 14) return false;
+                const kicker = ctx.uniqueValues.find(v => v !== quad);
+                return [2, 3, 4].includes(kicker);
+            },
+            indexes: ctx => {
+                const quad = ctx.uniqueValues.find(v => ctx.rankMap[v]?.length === 4);
+                const kicker = ctx.uniqueValues.find(v => v !== quad);
+                return [...ctx.rankMap[quad], ctx.rankMap[kicker][0]];
+            }
+        },
+
+        // FOUR ACES
+        {
+            rank: HAND_RANKS.FOUR_ACES,
+            priority: 750,
+            test: ctx => ctx.rankMap[14]?.length === 4,
+            indexes: ctx => ctx.rankMap[14] ?? []
+        },
+
+        // FOUR 2s, 3s, OR 4s
+        {
+            rank: HAND_RANKS.FOUR_2s_3s_4s,
+            priority: 700,
+            test: ctx => ctx.uniqueValues.some(v => [2, 3, 4].includes(v) && ctx.rankMap[v]?.length === 4),
+            indexes: ctx => {
+                const v = ctx.uniqueValues.find(v => [2, 3, 4].includes(v) && ctx.rankMap[v]?.length === 4);
+                return ctx.rankMap[v] ?? [];
+            }
+        },
+
+        // FOUR 5s THROUGH KINGS
+        {
+            rank: HAND_RANKS.FOUR_5s_THRU_KINGS,
+            priority: 650,
+            test: ctx => ctx.uniqueValues.some(v => v >= 5 && v <= 13 && ctx.rankMap[v]?.length === 4),
+            indexes: ctx => {
+                const v = ctx.uniqueValues.find(v => v >= 5 && v <= 13 && ctx.rankMap[v]?.length === 4);
+                return ctx.rankMap[v] ?? [];
+            }
+        },
+
+        // FULL HOUSE
+        {
+            rank: HAND_RANKS.FULL_HOUSE,
+            priority: 600,
+            test: ctx => ctx.counts.includes(3) && ctx.counts.includes(2),
+            indexes: ctx => ctx.allIndexes
+        },
+
+        // FLUSH
+        {
+            rank: HAND_RANKS.FLUSH,
+            priority: 500,
+            test: ctx => ctx.isFlush,
+            indexes: ctx => ctx.allIndexes
+        },
+
+        // STRAIGHT (supports Ace-low: A-2-3-4-5)
+        {
+            rank: HAND_RANKS.STRAIGHT,
+            priority: 400,
+            test: ctx => ctx.isStraight,
+            indexes: ctx => ctx.allIndexes
+        },
+
+        // THREE OF A KIND
+        {
+            rank: HAND_RANKS.THREE_OF_A_KIND,
+            priority: 300,
+            test: ctx => ctx.counts.includes(3) && !ctx.counts.includes(2),
+            indexes: ctx => {
+                const v = ctx.uniqueValues.find(v => ctx.rankMap[v]?.length === 3);
+                return ctx.rankMap[v] ?? [];
+            }
+        },
+
+        // TWO PAIR
+        {
+            rank: HAND_RANKS.TWO_PAIR,
+            priority: 200,
+            test: ctx => ctx.counts[0] === 2 && ctx.counts[1] === 2,
+            indexes: ctx => ctx.uniqueValues
+                .filter(v => ctx.rankMap[v]?.length === 2)
+                .sort((a, b) => b - a)
+                .flatMap(v => ctx.rankMap[v])
+        },
+
+        // JACKS OR BETTER
+        {
+            rank: HAND_RANKS.JACKS_OR_BETTER,
+            priority: 100,
+            test: ctx => {
+                // must be exactly one pair
+                if (ctx.counts[0] !== 2 || ctx.counts[1] !== 1) return false;
+
+                // that pair must be Jacks or higher
+                return ctx.uniqueValues.some(
+                    v => v >= 11 && ctx.rankMap[v]?.length === 2
+                );
+            },
+            indexes: ctx => {
+                const pairValue = ctx.uniqueValues
+                    .filter(v => v >= 11 && ctx.rankMap[v]?.length === 2)
+                    .sort((a, b) => b - a)[0];
+
+                return pairValue ? ctx.rankMap[pairValue] : [];
+            }
+        }
+    ]);
+
+    const State = Object.seal({  //  This prevents adding/removing properties but allows value changes.
+        isDeal: true,
+        credits: DEFAULTS.START_CREDITS,  
+        bet: DEFAULTS.MIN_BET,
+        win: null,
+        deck: [], 
+        hand: [], 
+        currentHandRank: null,
+        wonIndices: []
+    })
+
+    let UI = {}
+
+    function render(){
+        highlightPaytable()
+        
+        UI.win.textContent=`WIN ${State.win ?? 0}`
+        UI.win.classList.toggle('hidden', State.win===null || !State.isDeal)
+
+        if(State.win > 0) pulseCredits()
+        else UI.credits.textContent=`CREDITS ${State.credits}`
+
+        // let text = `PLAY ${State.bet} ${State.bet === 1 ? 'CREDIT' : 'CREDITS'}`
+        // if (State.win && State.win > 0) {
+        //     text = `YOU WON ${State.win} CREDITS<br>${text}`
+        // }
+        // UI.banner.innerHTML = text
+        UI.banner.textContent = `PLAY ${State.bet} ${State.bet===1? 'CREDIT': 'CREDITS'}`
+        
+        UI.banner.classList.toggle('hidden', !State.isDeal)
+
+        UI.betOneBtn.disabled=(!State.isDeal || State.credits <= 0)
+        UI.betMaxBtn.disabled=(!State.isDeal || State.bet===DEFAULTS.MAX_BET || State.credits <= 0)
+
+        UI.dealBtn.disabled=(State.credits <= 0 && State.isDeal)
+        UI.dealBtn.textContent = State.isDeal ? 'DEAL' : 'DRAW'
+
+        UI.resetBtn.disabled=(!State.isDeal || State.credits <= 0)
+
+        renderHand(State.hand)
+
+        UI.hand.classList.toggle('clickable', !State.isDeal);
+
+        if (State.isDeal && State.wonIndices.length > 0) {
+            const cardDivs = UI.hand.children;
+            const flashCards = State.wonIndices
+                .map(i => cardDivs[i])
+                .filter(Boolean);
+            flashCards.forEach(el => el.classList.add("flash"));
+            setTimeout(() => {
+                flashCards.forEach(el => el.classList.remove("flash"));
+            }, 3000);
+        }    
+    }
+
+    function renderPaytable(handRanks){
+        Object.values(handRanks).forEach(hand => {
+            const row = document.createElement("tr");
+
+            const nameCell = document.createElement("td");
+            nameCell.textContent = hand.name;
+            row.appendChild(nameCell);
+
+            hand.payout.forEach(value => {
+            const cell = document.createElement("td");
+            cell.textContent = value;
+            row.appendChild(cell);
+            });
+
+            UI.table.appendChild(row);
+        });
+    }
+    
+    function highlightPaytable(){      
+        let activeHandIndex=Object.values(HAND_RANKS).findIndex(rank => rank.name === State.currentHandRank) 
+        let activeBetIndex=State.bet
+
+        const rows = [...UI.table.rows];
+        const rowCells = [];
+        const colCells = [];
+
+        // Clear pervious & collect cells
+        rows.forEach((row, r) => {
+            Array.from(row.cells).forEach((cell, c) => {
+                cell.classList.remove('highlight-row', 'highlight-col', 'flash');
+                if (r === activeHandIndex) rowCells.push(cell);
+                if (c === activeBetIndex) colCells.push(cell);
+            });
+        });
+
+        // Apply new highlights
+        rowCells.forEach(cell => {
+            cell.classList.add('highlight-row');
+            if (State.isDeal) cell.classList.add('flash');
+        });
+
+        colCells.forEach(cell => {
+            cell.classList.add('highlight-col');
+        });
+
+        // Remove flash after a timer
+        if (State.isDeal) {
+            setTimeout(() => {
+            rowCells.forEach(cell => cell.classList.remove('flash'));
+            }, 3000);
+        }
+    }
+
+    function renderHand(hand){
+        UI.hand.innerHTML = ''
+        if (hand.length === 0) {
+            for (let i = 0; i < DEFAULTS.HAND_SIZE; i++) {
+                const cardDiv = document.createElement("div");
+                cardDiv.className = "card back";
+                UI.hand.append(cardDiv);
+            }
+            return;
+        }
+
+        hand.forEach((card, index) => {
+            const cardDiv = document.createElement('div')
+            cardDiv.className = 'card'
+            cardDiv.dataset.index = index
+            if (card.held) cardDiv.classList.add('held')
+            if (["♥", "♦"].includes(card.suit)){
+                cardDiv.classList.add("red");
+            }
+            const suitDiv = document.createElement('div')
+            suitDiv.textContent=`${card.suit}`
+            suitDiv.className='suit'
+            const rankDiv = document.createElement('div')
+            rankDiv.textContent=`${card.rank}`
+            rankDiv.className='rank'
+            cardDiv.append(suitDiv, rankDiv)
+            // cardDiv.innerHTML = `${card.rank}<br>${card.suit}`
+            UI.hand.append(cardDiv)
+        })
+    }
+
+    function pulseCredits() {
+        const el = UI.credits 
+        let start = State.credits - State.win
+        let stop = State.credits
+
+        const interval = setInterval(() => {
+            start++
+            el.textContent = `CREDITS ${start}`
+
+            el.classList.remove('pulse')
+            void el.offsetWidth
+            el.classList.add('pulse')
+
+            // vibrate on each tick (if supported)
+            if (navigator.vibrate) {
+                navigator.vibrate(50); // 50ms vibration each tick
+            }
+
+            if (start >= stop) clearInterval(interval)
+        }, 120)
+    }
+
+    function dispatch(action, ...args){
+        action(...args)
+        render()
+    }
+    
+    function cycleBet() {
+        clearRoundStat()
+        State.bet = State.bet % DEFAULTS.MAX_BET + 1
+    }
+
+    function maxBet(){
+        clearRoundStat()
+        State.bet = DEFAULTS.MAX_BET;
+    }
+
+    function handleDeal() {
+        if (State.isDeal){
+            clearRoundStat()
+            State.credits -= State.bet 
+            State.deck = createDeck(DEFAULTS.SUITS, DEFAULTS.RANKS, DEFAULTS.VALUES)
+            shuffleDeck(State.deck)
+            State.hand = State.deck.splice(0, DEFAULTS.HAND_SIZE)
+        }
+        else {
+            drawCards(State.hand, State.deck)
+        }
+        
+        if (State.hand){
+            const r = evaluateHand(State.hand)
+            if(r.handRank){
+                State.currentHandRank = r.handRank.name
+                if(!State.isDeal){
+                    State.win = r.handRank.payout[State.bet - 1]
+                    State.wonIndices = r.winningIndexes
+                }
+            }
+        }    
+        if (!State.isDeal && State.win) State.credits += State.win
+        State.isDeal = !State.isDeal 
+    }
+
+    function clearRoundStat(){
+        State.currentHandRank = null
+        State.win = null
+        State.wonIndices = []
+    }
+
+    function createDeck(suits, ranks, values){
+        return suits.flatMap(s => ranks.map(r => ({
+            suit: s,  
+            rank: r,
+            value: values[r]
+        })))
+    }
+
+    function shuffleDeck(deck){
+        for(let i=deck.length-1;i>0;i--){
+            const j=Math.floor(Math.random()*(i+1))
+            ;[deck[i],deck[j]]=[deck[j],deck[i]]
+        }
+    }
+
+    function drawCards(hand, deck){
+        hand.forEach((card, i)=>{
+            if(!card.held){
+                hand[i]=deck.splice(0, 1)[0]
+            }
+        })
+    }
+
+    function evaluateHand(hand) {
+        // State.currentHandRank = null
+        const cards = hand.map((card, index) => ({
+            ...card,
+            index
+        }));
+
+        const isFlush = hand.every(h => h.suit === hand[0].suit);
+        const sortedValues = cards.map(c => c.value).sort((a, b) => a - b)
+
+        const rankMap = {};
+        for (const c of cards) {
+            rankMap[c.value] ??= [];  // If rankMap[c.value] does not exist yet, create it as an empty array.
+            rankMap[c.value].push(c.index);  //  Card index pushed to array
+        }
+
+        const uniqueValues = Object.keys(rankMap)
+            .map(Number)
+            .sort((a, b) => a - b);
+
+        const counts = Object.values(rankMap)
+            .map(a => a.length)
+            .sort((a, b) => b - a);
+
+        const isStraight =
+            uniqueValues.length === 5 &&
+            (
+                sortedValues.toString() === "2,3,4,5,14" ||
+                sortedValues.every((v, i) => i === 0 || v === sortedValues[i - 1] + 1)
+            );
+
+        const ctx = {
+            cards,
+            sortedValues,
+            uniqueValues,
+            rankMap,
+            counts,
+            isFlush,
+            isStraight,
+            allIndexes: cards.map(c => c.index)
+        };
+
+        // sort once, highest priority first
+        const rulesByPriority = HAND_RULES
+            .slice()
+            .sort((a, b) => b.priority - a.priority);
+
+        for (const rule of rulesByPriority) {
+            if (rule.test(ctx)) {
+                return {
+                    handRank: rule.rank,
+                    winningIndexes: rule.indexes(ctx)
+                };
+            }
+        }
+
+        return {
+            // handRank,
+            // winningIndexes: []
+        };
+    }
+
+    function handleHold(index){
+        if(State.isDeal) return
+        const card = State.hand[index]
+        card.held = !card.held
+    }
+
+    function updateViewportSize(){
+        UI.viewport.innerText=`Viewport size: ${window.innerWidth} * ${window.innerHeight}`
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+         UI = {
+            table: document.getElementById('paytable'),
+            win: document.getElementById("win"),
+            credits: document.getElementById("credits"),
+            banner: document.getElementById("banner"),
+            betOneBtn: document.getElementById("betOneBtn"),
+            betMaxBtn: document.getElementById("betMaxBtn"),
+            dealBtn: document.getElementById("dealBtn"),
+            resetBtn: document.getElementById("resetBtn"),
+            hand: document.getElementById("hand"),
+            viewport: document.getElementById('viewport')
+        };
+
+        window.addEventListener('resize', updateViewportSize)
+        
+        // attach listeners AFTER UI is built
+        UI.betOneBtn.addEventListener("click", () => dispatch(cycleBet));
+        UI.betMaxBtn.addEventListener("click", () => dispatch(maxBet));
+        UI.dealBtn.addEventListener("click", () => dispatch(handleDeal));
+        UI.hand.addEventListener("click", (e) => {
+            const card = e.target.closest(".card");
+            if (!card) return;
+            dispatch(handleHold, +card.dataset.index);
+        });
+
+        updateViewportSize()
+        renderPaytable(HAND_RANKS)
+        render();
+    });
+
+</script>
+</body>
+</html>
