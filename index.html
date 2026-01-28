@@ -308,16 +308,16 @@
         document.getElementById('language').textContent = user.language_code || 'N/A'; 
     }
 
-    function updateViewportSize() {
+    function updateViewportSize(){
         const viewportWidth = tg.viewportWidth;
         const viewportHeight = tg.viewportHeight;
         // const documentHeight = document.documentElement.scrollHeight;
 
-
         document.getElementById('viewport-width').textContent = viewportWidth;
         document.getElementById('viewport-height').textContent = viewportHeight;
         // document.getElementById('document-height').textContent = documentHeight;
-    
+    }
+        
     const DEFAULTS = Object.freeze({  //  Read only object
         START_CREDITS: 100,
         MIN_BET: 1,
@@ -861,4 +861,5 @@
 </body>
 
 </html>
+
 
