@@ -291,13 +291,13 @@
     </div>
     <div class="viewport">
         <h3>Viewport Info:</h3>
-        <p><strong>Real Viewport Width:</strong> <span id="viewport-fullscreen">Loading...</span> px</p>
-        <p><strong>Real Viewport Width:</strong> <span id="viewport-width">Loading...</span> px</p>
+        <p><strong>Is Viewport Fullscreen:</strong> <span id="viewport-fullscreen">Loading...</span> px</p>
         <p><strong>Real Viewport Height:</strong> <span id="viewport-height">Loading...</span> px</p>
-      <!-- <p><strong>Document Height:</strong> <span id="document-height">Loading...</span> px</p> -->
+        <p><strong>viewport Stable Height:</strong> <span id="viewport-stable-height">Loading...</span> px</p>
+        <p><strong>Document Height:</strong> <span id="document-height">Loading...</span> px</p>
     </div>
 </footer>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js?59"></script>
 <script>
     const tg = window.Telegram.WebApp
     if(tg){
@@ -314,14 +314,14 @@
     }
 
     function updateViewportSize(){
-        const viewportWidth = tg.viewportWidth
-        const viewportHeight = tg.viewportHeight
-        // const documentHeight = document.documentElement.scrollHeight;
+    //     const viewportWidth = tg.viewportWidth
+    //     const viewportHeight = tg.viewportHeight
+    //     const documentHeight = document.documentElement.scrollHeight;
 
         document.getElementById('viewport-fullscreen').textContent = tg.isExpanded;
-        document.getElementById('viewport-width').textContent = tg.viewportWidth;
         document.getElementById('viewport-height').textContent = tg.viewportHeight;
-        // document.getElementById('document-height').textContent = documentHeight;
+        document.getElementById('viewport-stable-height').textContent = tg.viewportStableHeight;
+        document.getElementById('document-height').textContent = document.documentElement.scrollHeight;
     }
         
     const DEFAULTS = Object.freeze({  //  Read only object
