@@ -291,6 +291,7 @@
     </div>
     <div class="viewport">
         <h3>Viewport Info:</h3>
+        <p><strong>Real Viewport Width:</strong> <span id="viewport-fullscreen">Loading...</span> px</p>
         <p><strong>Real Viewport Width:</strong> <span id="viewport-width">Loading...</span> px</p>
         <p><strong>Real Viewport Height:</strong> <span id="viewport-height">Loading...</span> px</p>
       <!-- <p><strong>Document Height:</strong> <span id="document-height">Loading...</span> px</p> -->
@@ -317,6 +318,7 @@
         const viewportHeight = tg.viewportHeight
         // const documentHeight = document.documentElement.scrollHeight;
 
+        document.getElementById('viewport-fullscreen').textContent = tg.isExpanded;
         document.getElementById('viewport-width').textContent = tg.viewportWidth;
         document.getElementById('viewport-height').textContent = tg.viewportHeight;
         // document.getElementById('document-height').textContent = documentHeight;
@@ -864,6 +866,7 @@
 </body>
 
 </html>
+
 
 
 
