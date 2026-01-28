@@ -282,7 +282,7 @@
   <button id="resetBtn" disabled>CASH OUT</button>
 </div>
 <footer>
-    Created by: <a href="https://www.t.me/u002e">@u002E</a>; <span id="viewport"></span><br>
+    <p>Created by: <a href="https://www.t.me/u002e">@u002E</a></p>
     <div class="user-info">
       <h3>Your Info:</h3>
       <p><strong>User ID:</strong> <span id="user-id">Loading...</span></p>
@@ -298,12 +298,7 @@
 </footer>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
-    const tg = window.Telegram.WebApp
-    if(tg){
-        tg.ready()
-        tg.expand()
-    }
-
+    
     function updateUserData(){
         const user = tg.initDataUnsafe.user;
         
@@ -317,8 +312,8 @@
         const viewportHeight = tg.viewportHeight
         // const documentHeight = document.documentElement.scrollHeight;
 
-        document.getElementById('viewport-width').textContent = viewportWidth;
-        document.getElementById('viewport-height').textContent = viewportHeight;
+        document.getElementById('viewport-width').textContent = tg.viewportWidth;
+        document.getElementById('viewport-height').textContent = tg.viewportHeight;
         // document.getElementById('document-height').textContent = documentHeight;
     }
         
@@ -839,7 +834,7 @@
             dealBtn: document.getElementById("dealBtn"),
             resetBtn: document.getElementById("resetBtn"),
             hand: document.getElementById("hand"),
-            viewport: document.getElementById('viewport')
+            // viewport: document.getElementById('viewport')
         };
 
         // window.addEventListener('resize', updateViewportSize)
@@ -854,7 +849,11 @@
             if (!card) return;
             dispatch(handleHold, +card.dataset.index);
         });
-
+        const tg = window.Telegram.WebApp
+        if(tg){
+            tg.ready()
+            tg.expand()
+        }
         updateUserData()
         updateViewportSize()
         renderPaytable(HAND_RANKS)
@@ -865,6 +864,7 @@
 </body>
 
 </html>
+
 
 
 
