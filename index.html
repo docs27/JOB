@@ -2,54 +2,74 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jacks or Better</title>
 <style>
-    html{
-        font-size: 12px;
+    *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        user-select: none;   /* Standard property */
+        -webkit-user-select: none; /* Chrome/Safari */
+        -moz-user-select: none;    /* Firefox */
+        -ms-user-select: none;     /* IE/Edge */
     }
-    /* @font-face {
-        font-family: 'MyFont';
-        src: url('cardcharacters.ttf') format('truetype');
-        font-weight: normal;
-        font-style: normal;
-        } */
-    body {
+    html{
+        background-color: black;
+        color: white;
+        width: 100vw;
         height: 100vh;
+    }
+    body {
+        width: 100%;
+        height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
         font-family: system-ui, sans-serif;
         letter-spacing: .1rem; 
-        background:darkblue; 
-        color: white;
-        margin: 0;
-        box-sizing: border-box;
-
-        user-select: none;   /* Standard property */
-        -webkit-user-select: none; /* Chrome/Safari */
-        -moz-user-select: none;    /* Firefox */
-        -ms-user-select: none;     /* IE/Edge */
+        background:darkblue;
+        padding: 1rem;
+        overflow: hidden;
     }
-
-    /* --- Paytable --- */
-    .tbl {
+    .container {
+        position: relative;
+        width: 100%;
+        min-width: 13rem;
+        max-width: 62rem;
+        overflow: hidden;
+        /* background-color: greenyellow; */
+        /* resize: horizontal; */
+        /* overflow: auto; */
+        /* background-color: red; */
+        /* width: 90%; */
+        /* margin-top: 2rem; */
+        /* box-sizing: border-box; */
+    }
+    .title{
+        font-size: 2rem;
+        font-weight: bold;
+        /* margin-top: 2rem; */
+        /* color: white; */
+    }
+    .frame {
+        /* width: 100%; */
         border: 1px solid yellow;
         border-radius: .5rem;
         padding: .2rem;
-        box-sizing: border-box;
-        overflow: hidden;
         background: rgba(0,0,0,.7);
+        flex-shrink: 0;
     }
     
     table {
         border-collapse: collapse;
         width: 100%;
+        height: 100%;
         color: yellow;
         border: none;
         line-height: 1rem;
         table-layout: fixed;
+        white-space: nowrap;
     }
 
     table td {
@@ -58,14 +78,19 @@
     }
     table td:first-child {
         text-align: left;
-        width: 16rem;
+        width: 46%;
+    }
+    .collapsed {
+        display: none;
+
     }
     .highlight-row {
         background: rgba(255, 255, 255, 0.33);
-        /* color: white; */
-        /* font-weight: bold; */
     }
-
+    .won-row{
+        /* color: white; */
+        font-weight: bold;
+    }
     .highlight-col {
         background: rgba(255, 0, 0, .33);
     }
@@ -73,28 +98,27 @@
     .highlight-row.highlight-col {
         background: rgba(255, 0, 0, .66);
     }
-    .container{
-        position: relative;
-        /* background-color: red; */
-        width: 32rem;
-        /* margin-top: 2rem; */
-    }
     .banner{
+        /* width: inherit; */
+        white-space: nowrap;
         display:flex;
-        justify-content: center;
-        align-items: center;
+        /* justify-content: center; */
+        /* align-items: center; */
+        text-align: center;
         position: absolute;
-        /* color: yellow; */
+        color: yellow;
+        font-weight: bold;
         top: 50%;
         left: 50%;
         transform: translateX(-50%) translateY(-30%);
-        font-size: 1.5rem;
+        font-size: 2rem;
         background-color: rgba(0,0,0,.7);
-        backdrop-filter: blur(5px);
-        padding: 1.5rem;
+        backdrop-filter: blur(3px);
+        padding: .5rem 1rem;
         border-radius: .5rem;
         border: solid 1px yellow;
-        box-shadow: 10px 10px 20px rgba(0,0,0,.4);
+        box-shadow: 10px 10px rgba(0,0,0,.3);
+        z-index: 10;
     }
     .hidden{
         visibility: hidden;
@@ -113,73 +137,86 @@
         -1px 1px yellow;
     }
     .hand {
+        position: relative;
         display: flex;
-        justify-content: center;
-        position: relative; 
-        gap: .5rem; 
-        margin-top: 2rem; 
+        /* width: 100%; */
+        justify-content: space-between;
+        /* align-items: center;  */
+        margin-top: 2rem;
+        /* resize: horizontal; */
+        /* overflow: hidden;  */
     }
     .hand.clickable .card {
         cursor: pointer;
         pointer-events: all;
     }
     .card {
-        /* font-family: MyFont, sans-serif; */
-        position: relative;
+        width: 12rem;
+        height: 18rem;
+        background: white;
+        border-radius: .5rem;
+        border: 1px solid rgb(100, 100, 100);
+        padding: 10px;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        box-shadow: -2px 2px 0px rgba(0,0,0,.3);
+        flex-shrink: 0;
+        color: black;
+    }
+
+    .corner {
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        /* align-items: center; */
-        width: 6rem;
-        height: 8.4rem;
-        /* font-size: 1.6rem; */
-        /* line-height: 1.4rem; */
-        /* font-weight: bold; */
-        color: black;
-        background-color: white;
-        transition: transform 0.2s, box-shadow 0.2s;
-        /* border: 2px solid #333; */
-        border-radius: .3rem;
-        padding: .3rem;
-        box-sizing: border-box;
-        cursor: not-allowed;
-        pointer-events: none;
-        box-shadow: 3px 3px 5px black;
+        line-height: 2rem;
+        /* background-color: aqua; */
     }
+
+    .corner.bottom {
+        transform: rotate(180deg);
+        align-self: end;
+    }
+
+    .rank {
+        font-size: 2.4rem;
+        font-weight: bold;
+    }
+
+    .suit {
+        font-size: 2.4rem;
+    }
+
+    .center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 90px;
+        /* background-color: blueviolet; */
+    }
+
+    /* Suit colors */
     .card.red {
         color: red;
-    }
-    .card .suit {
-        font-size: 3rem;
-        line-height: 1.4rem;
-    }
-    .card .rank {
-        /* background-color: aqua; */
-        font-size: 5rem;
-        text-align: center;
-        /* width: 100%; */
-        line-height: 5.5rem;
-        letter-spacing: -.6rem;
-        transform: translateX(-.5rem);
-        /* font-weight: bold; */
     }
     .card.back {
         background-color: lightcoral;
         border: white solid 5px;
     }
     .card.held {
-        box-shadow: none;
-        transform: translateX(2px) translateY(2px);
+        /* box-shadow: none; */
+        /* box-shadow: 0 1px 8px black; */
+        /* transform: translateX(2px) translateY(2px); */
+        transform: translateY(0px);
     }
     .card.held::before {
         content: "HELD";
         position: absolute;
-        top: -20%;
-        left: 50%;
-        transform: translateX(-50%);
+        top: -10%;
+        /* left: 50%; */
+        /* transform: translateX(-50%); */
+        transform: translateX(10%);
         color: white;
         font-size: 1rem;
-        font-weight: normal;
+        font-weight: bold;
     }
     td.flash {
         /* background-color: lawngreen; */
@@ -210,21 +247,23 @@
     }
     .stats{
         display:flex;
+        font-weight: bold;
+        font-size: 1.2rem;
+        /* width: auto; */
         justify-content: space-between;
-        margin: 1rem;
+        /* margin: 1rem; */
+        flex-shrink: 0;
     }
-    /* .stat{
-        color: yellow;
-        font-size: 1rem;
-    } */
     .buttons{
         display: flex;
         justify-content: space-between;
-        gap: 1rem;
+        gap: 3%;
+        padding-bottom: 4px;
+        flex-shrink: 0;
     }
     button {
         padding: 8px 15px;
-        min-width: 6rem;
+        min-width: 4rem;
         min-height: 4rem;
         font-size: 1rem;
         font-weight: bold; 
@@ -233,18 +272,23 @@
         border: none;
         border-radius: .5rem;
         flex:1;
-        box-shadow: 3px 3px 0 rgb(100, 100, 0);
+        /* box-shadow: 3px 3px 0 rgb(100, 100, 0); */
+        box-shadow: 0 4px 0 rgb(100, 100, 0);
     }
     button:disabled {
         cursor: not-allowed;
         background-color: darkgray;
-        box-shadow: 3px 3px 0 gray;
+        /* box-shadow: 3px 3px 0 gray; */
+        box-shadow: 0px 4px 0 gray;
     }
     button:active {
-        box-shadow: 1px 1px 0 gray;
-        transform: translateX(2px) translateY(2px);
+        /* box-shadow: 1px 1px 0 gray; */
+        box-shadow: 0 1px 0 gray;
+        /* transform: translateX(2px) translateY(2px); */
+        transform: translateY(3px);
     }
-    footer {
+    .footer {
+        font-size: .8rem;
         color: rgb(0,100,255);
     }
     a {
@@ -256,23 +300,22 @@
 </head>
 <body>
 
-<h1>JACKS or BETTER</h1>
+<span class="title">JACKS or BETTER</span>
 <!-- <p>Double Double Bonus</p> -->
 
-<div class="container tbl">
+<div class="container frame">
     <table id="paytable"></table>
 </div>
 
 <div class="container">
+    <span class="banner" id="banner"></span>
     <div class="hand" id="hand"></div>
-    <!-- Second here to see banner over cards -->
-    <span class="banner outlined" id="banner"></span>
 </div>
 
 <div class="container stats">
-    <span class="stat outlined" id="win"></span>
+    <span class="stat" id="win"></span>
     <!-- <span> Bet: <span id="bet"></span></span> -->
-  <span class="stat outlined" id="credits"></span>
+  <span class="stat" id="credits"></span>
 </div>
 
 <div class="container buttons">
@@ -281,22 +324,12 @@
   <button id="dealBtn" disabled>DEAL</button>
   <button id="resetBtn" disabled>CASH OUT</button>
 </div>
-<footer>
-    <p>Created by: <a href="https://www.t.me/u002e">@u002E</a></p>
-    <div class="user-info">
-      <h3>Your Info:</h3>
-      <p><strong>User ID:</strong> <span id="user-id">Loading...</span></p>
-      <p><strong>Username:</strong> <span id="username">Loading...</span></p>
-      <p><strong>Language:</strong> <span id="language">Loading...</span></p>
-    </div>
-    <div class="viewport">
-        <h3>Viewport Info:</h3>
-        <p><strong>Is Viewport Fullscreen:</strong> <span id="viewport-fullscreen">Loading...</span> px</p>
-        <p><strong>Real Viewport Height:</strong> <span id="viewport-height">Loading...</span> px</p>
-        <p><strong>viewport Stable Height:</strong> <span id="viewport-stable-height">Loading...</span> px</p>
-        <p><strong>Document Height:</strong> <span id="document-height">Loading...</span> px</p>
-    </div>
-</footer>
+<div class="footer">
+    User info: <span id="user-id">Loading...</span>, <span id="username">Loading...</span>, <span id="language">Loading...</span><br>
+    Viewport data: <span>Loading...</span>, <span>Loading...</span>, <span>Loading...</span>, <span>Loading...</span><br>
+    Created by: <a href="https://www.t.me/u002e">@u002E</a>; <span id="viewport"></span> 
+</div>
+
 <script src="https://telegram.org/js/telegram-web-app.js?59"></script>
 <script>
     const tg = window.Telegram.WebApp
@@ -304,26 +337,23 @@
         tg.ready()
         tg.expand()
     }
-    
+
     function updateUserData(){
         const user = tg.initDataUnsafe.user;
-        
         document.getElementById('user-id').textContent = user.id || 'N/A';
         document.getElementById('username').textContent = user.username || 'N/A';
         document.getElementById('language').textContent = user.language_code || 'N/A'; 
     }
 
     function updateViewportSize(){
-    //     const viewportWidth = tg.viewportWidth
-    //     const viewportHeight = tg.viewportHeight
-    //     const documentHeight = document.documentElement.scrollHeight;
-
         document.getElementById('viewport-fullscreen').textContent = tg.isExpanded;
         document.getElementById('viewport-height').textContent = tg.viewportHeight;
         document.getElementById('viewport-stable-height').textContent = tg.viewportStableHeight;
         document.getElementById('document-height').textContent = document.documentElement.scrollHeight;
     }
-        
+
+    let UI = {}
+
     const DEFAULTS = Object.freeze({  //  Read only object
         START_CREDITS: 100,
         MIN_BET: 1,
@@ -538,12 +568,9 @@
         wonIndices: []
     })
 
-    let UI = {}
-
     function render(){
         highlightPaytable()
-        
-        UI.win.textContent=`WIN ${State.win ?? 0}`
+        UI.win.textContent=State.win>0?`WIN ${State.win}`:'NO WIN'
         UI.win.classList.toggle('hidden', State.win===null || !State.isDeal)
 
         if(State.win > 0) pulseCredits()
@@ -564,7 +591,7 @@
         UI.dealBtn.disabled=(State.credits <= 0 && State.isDeal)
         UI.dealBtn.textContent = State.isDeal ? 'DEAL' : 'DRAW'
 
-        UI.resetBtn.disabled=(!State.isDeal || State.credits <= 0)
+        // UI.resetBtn.disabled=(!State.isDeal || State.credits <= 0)
 
         renderHand(State.hand)
 
@@ -635,35 +662,76 @@
         }
     }
 
-    function renderHand(hand){
-        UI.hand.innerHTML = ''
+    function renderHand(hand) {
+        const handEl = UI.hand;
+        handEl.innerHTML = '';
+
+        // Empty hand → show backs
         if (hand.length === 0) {
             for (let i = 0; i < DEFAULTS.HAND_SIZE; i++) {
-                const cardDiv = document.createElement("div");
-                cardDiv.className = "card back";
-                UI.hand.append(cardDiv);
+                const back = document.createElement('div');
+                back.className = 'card back';
+                handEl.appendChild(back);
             }
+
+            updateHandLayout();
             return;
         }
 
         hand.forEach((card, index) => {
-            const cardDiv = document.createElement('div')
-            cardDiv.className = 'card'
-            cardDiv.dataset.index = index
-            if (card.held) cardDiv.classList.add('held')
-            if (["♥", "♦"].includes(card.suit)){
-                cardDiv.classList.add("red");
-            }
-            const suitDiv = document.createElement('div')
-            suitDiv.textContent=`${card.suit}`
-            suitDiv.className='suit'
-            const rankDiv = document.createElement('div')
-            rankDiv.textContent=`${card.rank}`
-            rankDiv.className='rank'
-            cardDiv.append(suitDiv, rankDiv)
-            // cardDiv.innerHTML = `${card.rank}<br>${card.suit}`
-            UI.hand.append(cardDiv)
-        })
+            handEl.appendChild(createCardElement(card, index));
+        });
+
+        updateHandLayout();
+    }
+
+    function createCardElement(card, index) {
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'card';
+        cardDiv.dataset.index = index;
+
+        if (card.held) cardDiv.classList.add('held');
+        if (card.suit === '♥' || card.suit === '♦') {
+            cardDiv.classList.add('red');
+        }
+
+        // ── Top corner ─────────────────────────────
+        const topCorner = document.createElement('div');
+        topCorner.className = 'corner top';
+
+        const topRank = document.createElement('span');
+        topRank.className = 'rank';
+        topRank.textContent = card.rank;
+
+        const topSuit = document.createElement('span');
+        topSuit.className = 'suit';
+        topSuit.textContent = card.suit;
+
+        topCorner.append(topRank, topSuit);
+
+        // ── Center ─────────────────────────────────
+        const center = document.createElement('div');
+        center.className = 'center';
+        center.textContent = card.suit; // placeholder (pip / face later)
+
+        // ── Bottom corner (mirrored) ───────────────
+        const bottomCorner = document.createElement('div');
+        bottomCorner.className = 'corner bottom';
+
+        const bottomRank = document.createElement('span');
+        bottomRank.className = 'rank';
+        bottomRank.textContent = card.rank;
+
+        const bottomSuit = document.createElement('span');
+        bottomSuit.className = 'suit';
+        bottomSuit.textContent = card.suit;
+
+        bottomCorner.append(bottomRank, bottomSuit);
+
+        // ── Assemble ───────────────────────────────
+        cardDiv.append(topCorner, center, bottomCorner);
+
+        return cardDiv;
     }
 
     function pulseCredits() {
@@ -704,6 +772,7 @@
     }
 
     function handleDeal() {
+        // Deal phase
         if (State.isDeal){
             clearRoundStat()
             State.credits -= State.bet 
@@ -711,8 +780,10 @@
             shuffleDeck(State.deck)
             State.hand = State.deck.splice(0, DEFAULTS.HAND_SIZE)
         }
+        // Draw phase
         else {
             drawCards(State.hand, State.deck)
+            // clearHolds()
         }
         
         if (State.hand){
@@ -720,11 +791,12 @@
             if(r.handRank){
                 State.currentHandRank = r.handRank.name
                 if(!State.isDeal){
-                    State.win = r.handRank.payout[State.bet - 1]
+                    State.win = r.handRank.payout[State.bet - 1] ?? 0
                     State.wonIndices = r.winningIndexes
                 }
             }
-        }    
+            else State.win = 0
+        }   
         if (!State.isDeal && State.win) State.credits += State.win
         State.isDeal = !State.isDeal 
     }
@@ -759,11 +831,7 @@
     }
 
     function evaluateHand(hand) {
-        // State.currentHandRank = null
-        const cards = hand.map((card, index) => ({
-            ...card,
-            index
-        }));
+        const cards = hand.map((card, index) => ({...card,index}));
 
         const isFlush = hand.every(h => h.suit === hand[0].suit);
         const sortedValues = cards.map(c => c.value).sort((a, b) => a - b)
@@ -771,7 +839,7 @@
         const rankMap = {};
         for (const c of cards) {
             rankMap[c.value] ??= [];  // If rankMap[c.value] does not exist yet, create it as an empty array.
-            rankMap[c.value].push(c.index);  //  Card index pushed to array
+            rankMap[c.value].push(c.index);  // Card index pushed to array
         }
 
         const uniqueValues = Object.keys(rankMap)
@@ -785,7 +853,7 @@
         const isStraight =
             uniqueValues.length === 5 &&
             (
-                sortedValues.toString() === "2,3,4,5,14" ||
+                sortedValues.toString() === "2,3,4,5,14" ||  // Lowest straight with Ace case
                 sortedValues.every((v, i) => i === 0 || v === sortedValues[i - 1] + 1)
             );
 
@@ -815,8 +883,8 @@
         }
 
         return {
-            // handRank,
-            // winningIndexes: []
+            handRank: null,
+            winningIndexes: []
         };
     }
 
@@ -826,9 +894,47 @@
         card.held = !card.held
     }
 
-    // function updateViewportSize(){
-    //     UI.viewport.innerText=`Viewport size: ${window.innerWidth} * ${window.innerHeight}`
-    // }
+    function updateHandLayout() {
+        const cards = Array.from(UI.hand.children); //
+        if (cards.length === 0) return; //
+        
+        const handWidth = UI.hand.clientWidth;
+        const cardWidth = cards[0].offsetWidth;
+        const cardsCount = cards.length;
+
+        const totalWidth = cardWidth * cardsCount;  //
+        let overlap = 0; //
+
+        if (totalWidth > handWidth) {
+            overlap = (totalWidth - handWidth) / (cardsCount-1);
+            overlap = Math.min(overlap, cardWidth);
+        }
+
+        cards.forEach((card, index) => {
+            card.style.marginLeft = index === 0 ? '0px' : `-${overlap}px`;
+            card.style.zIndex = index; // ensures proper stacking
+        });
+    }
+
+    function updateViewportSize(){
+        UI.viewport.textContent=`Viewport size: ${window.innerWidth} * ${window.innerHeight}`
+    }
+
+    function debounce(fn, delay = 100) {
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => fn(...args), delay);
+        };
+    }
+
+    window.addEventListener(
+        "resize",
+        debounce(() => {
+            updateHandLayout();
+            updateViewportSize();
+        }, 100)
+    );
 
     document.addEventListener("DOMContentLoaded", () => {
          UI = {
@@ -841,12 +947,9 @@
             dealBtn: document.getElementById("dealBtn"),
             resetBtn: document.getElementById("resetBtn"),
             hand: document.getElementById("hand"),
-            // viewport: document.getElementById('viewport')
+            viewport: document.getElementById('viewport')
         };
 
-        // window.addEventListener('resize', updateViewportSize)
-        tg.onEvent('viewportChanged', updateViewportSize)
-        
         // attach listeners AFTER UI is built
         UI.betOneBtn.addEventListener("click", () => dispatch(cycleBet));
         UI.betMaxBtn.addEventListener("click", () => dispatch(maxBet));
@@ -856,20 +959,12 @@
             if (!card) return;
             dispatch(handleHold, +card.dataset.index);
         });
-        updateUserData()
+
         updateViewportSize()
         renderPaytable(HAND_RANKS)
-        render();
+        render()
     });
 
 </script>
 </body>
-
 </html>
-
-
-
-
-
-
-
