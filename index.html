@@ -78,7 +78,7 @@
     }
     table td:first-child {
         text-align: left;
-        width: 46%;
+        width: 48%;
     }
     .collapsed {
         display: none;
@@ -296,6 +296,27 @@
         color: rgb(0,100,255);
     }
 
+    @media (max-width: 479px) or (max-height: 559px) {
+        html {
+            font-size: 14px;
+        }
+    }
+    @media (max-width: 399px) or (max-height: 499px) {
+        html {
+            font-size: 12px;
+        }
+    }
+    @media (max-width: 339px) or (max-height: 419px) {
+        html {
+            font-size: 10px;
+        }
+    }
+    @media (max-width: 289px) or (max-height: 359px) {
+        html {
+            font-size: 8px;
+        }
+    }
+
 </style>
 </head>
 <body>
@@ -339,6 +360,7 @@
     }
 
     function updateUserData(){
+        if(!tg) return
         const user = tg.initDataUnsafe.user;
         document.getElementById('user-id').textContent = user.id || 'N/A';
         document.getElementById('username').textContent = user.username || 'N/A';
@@ -346,6 +368,7 @@
     }
 
     function updateViewportSize(){
+        if(!tg) return
         document.getElementById('viewport-fullscreen').textContent = tg.isExpanded;
         document.getElementById('viewport-height').textContent = tg.viewportHeight;
         document.getElementById('viewport-stable-height').textContent = tg.viewportStableHeight;
@@ -908,6 +931,10 @@
         if (totalWidth > handWidth) {
             overlap = (totalWidth - handWidth) / (cardsCount-1);
             overlap = Math.min(overlap, cardWidth);
+
+            // Optional: ensure minimum visible portion (30px)
+            // const MIN_VISIBLE = 30;
+            // overlap = Math.min(overlap, cardWidth - MIN_VISIBLE);
         }
 
         cards.forEach((card, index) => {
@@ -934,10 +961,8 @@
         debounce(() => {
             updateHandLayout();
             updateViewportSize();
-            if(tg){
-                updateUserData();
-                updateViewportSize();
-            }
+            updateUserData();
+            updateViewportSize();
         }, 100)
     );
 
@@ -955,7 +980,9 @@
             viewport: document.getElementById('viewport')
         };
 
-       // attach listeners AFTER UI is built
+
+        
+        // attach listeners AFTER UI is built
         UI.betOneBtn.addEventListener("click", () => dispatch(cycleBet));
         UI.betMaxBtn.addEventListener("click", () => dispatch(maxBet));
         UI.dealBtn.addEventListener("click", () => dispatch(handleDeal));
