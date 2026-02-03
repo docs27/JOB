@@ -912,6 +912,7 @@
 
         cards.forEach((card, index) => {
             card.style.marginLeft = index === 0 ? '0px' : `-${overlap}px`;
+            // card.style.transform = index === 0 ? 'translateX(0)' : `translateX(${-overlap}px)`;
             card.style.zIndex = index; // ensures proper stacking
         });
     }
@@ -933,6 +934,10 @@
         debounce(() => {
             updateHandLayout();
             updateViewportSize();
+            if(tg){
+                updateUserData();
+                updateViewportSize();
+            }
         }, 100)
     );
 
@@ -950,7 +955,7 @@
             viewport: document.getElementById('viewport')
         };
 
-        // attach listeners AFTER UI is built
+       // attach listeners AFTER UI is built
         UI.betOneBtn.addEventListener("click", () => dispatch(cycleBet));
         UI.betMaxBtn.addEventListener("click", () => dispatch(maxBet));
         UI.dealBtn.addEventListener("click", () => dispatch(handleDeal));
